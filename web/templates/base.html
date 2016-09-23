@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+
+{% load staticfiles %}
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>GPS</title>
+    <meta name="author" content="MWS">
+    <link href="{% static 'base/lib/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    {% block add_css %}
+    {% endblock %}
+
+</head>
+
+{% block title %}
+{% endblock %}
+
+{% block header %}
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <div class="navbar-collapse collapse">
+
+                <a class="navbar-brand" href="">Continuous GPS</a>
+
+                {% if user.is_authenticated %}
+                <ul class="nav navbar-nav">
+                    <li><a href="/#view">View</a> </li>
+                    <li><a href="/#submit">Submit</a> </li>
+                    <li><a href="/#notifications">Notifications</a> </li>
+                    <!-- <li><a href="/#locations">Locations</a> </li> -->
+                    <!-- <li><a href="#frames">Frames</a></li> -->
+                    <!-- <li><a href="#notifications">Notifications</a></li> -->
+                    <!-- <li><a href="/#dashboard">Dashboard</a></li> -->
+                    <!-- <li><a href="/data/upload">Shapefile</a></li> -->
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right pull-right">
+
+                    <!-- <li><a href="/accounts/password_change">Change password</a></li> -->
+
+                    <li>
+                        <a href="{% url 'logout' %}"> Log out {{ user.username }}</a>
+                    </li>
+                </ul>
+                {% else %}
+                <!-- 
+                <ul class="nav navbar-nav">
+                    <li><a href="#catalogue">Catalogue</a> </li>
+                    <li><a href="#locations">Locations</a> </li>
+                    <li><a href="#frames">Frames</a></li>
+                    <li><a href="#notifications">Notifications</a></li>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                </ul>
+ -->
+                <ul class="nav navbar-nav navbar-right pull-right">
+                    <li>
+                        <a href="{% url 'login' %}"> Log in</a>
+                    </li>
+                </ul>
+                {% endif %}
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block all_content %}
+<div class="container" style="padding-top: 60px">
+    {% block content %}
+    <!-- This is replaced by index.html-->
+    {% endblock %}
+</div>
+{% endblock %}
+
+<script src="{% static 'base/lib/angular/angular.js' %}"></script>
+<script src="{% static 'base/lib/angular/angular-resource.js' %}"></script>
+<script src="{% static 'base/lib/angular/angular-cookies.js' %}"></script>
+<script src="{% static 'base/lib/angular/angular-route.js' %}"></script>
+
+{% block add_scripts %}
+<!-- This is replaced by index.html-->
+{% endblock %}
+
+
+</body>
+</html>

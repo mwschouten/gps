@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+<h1>WORK IN PROGRESS</h1>
+    {% if form.errors %}
+    <p class="errorlist">{% trans "Sorry there are corrections needed in your form below:" %} {{ form.non_field_errors }}</p>
+    {% endif %}
+    {% if form.is_multipart %}
+    <form enctype="multipart/form-data" method="post" action=".">
+    {% else %}
+    <form method="post" action=".">
+   {% endif %}
+   {{ form.as_p }}
+   {% csrf_token %}
+   <input type="submit" value="Upload Zipped Shapefile" />
+   </form>
+{% endblock %}
