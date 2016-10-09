@@ -1,6 +1,6 @@
 
 var app = angular.module('nlogproduction', 
-    ['ngCookies','ngRoute','ui.bootstrap','ngFileUpload','highcharts-ng'])
+    ['ngCookies','ngRoute','ui.bootstrap','ngFileUpload','highcharts-ng','treeControl'])
 
 
 // var app = angular.module('fileUpload', ['ngFileUpload']);

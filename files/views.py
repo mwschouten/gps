@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from files.models import Document
 from files.forms import DocumentForm
 from django.contrib.auth.decorators import login_required
+from experts.import_file import import_xlsx
 
 # @login_required
 # def list(request):
@@ -38,7 +39,7 @@ def submit(request):
     print('REQUEST.FILES', request.FILES)
     print('REQUEST.FILES', request.FILES['docfile'].__dict__)
     print('REQUEST.POST', request.POST)
-
+    name = request.FILES['docfile']._name
     # Handle file upload
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
@@ -53,9 +54,11 @@ def submit(request):
             print ('NEWDOC ',newdoc)
             print ('NEWDOC ',newdoc.__dict__)
             print ('NEWDOC ',newdoc.docfile.__dict__)
+            file_stored = 'media/' + newdoc.docfile.name
+            print ('FILE STORED ',file_stored)
 
-
-            ok,matched = import_file(newdoc.docfile.name)
+            ok,matched = import_xlsx(filename = request.FILES['docfile']._name,
+                                     file_stored = file_stored)
 
 
             # Respond ANYWAY

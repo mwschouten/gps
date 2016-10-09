@@ -56,7 +56,34 @@
     cursor: pointer;
 }
 
+
+
+/* Tree */
+ul.tree {
+  list-style-type: none;
+  padding-left:20px;
   
+  li:before {
+     content: "-";
+     display: inline-block;
+     width: 10px;
+  }    
+}
+.tree .collapsed ul {
+  display: none;
+}
+.tree li.collapsed:before {
+  content: '+';
+  display: inline-block;
+  width: 10px;
+}  
+.tree li a:hover {
+  cursor: pointer;
+}
+
+
+
+
 /*ng-TABLE */
 table.table-rowselected tr {
     cursor: pointer;

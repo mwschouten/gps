@@ -18,7 +18,7 @@ class Location(models.Model):
         if self.project is None:
             proj = '-'
         else:
-            proj = self.project__name 
+            proj = self.project.name 
         return '%s (%s)' % (self.name,proj)
 
 
@@ -27,7 +27,7 @@ class Delivery(models.Model):
     filename_stored = models.CharField(max_length=200,blank=True,null=True)
     contributor = models.CharField(max_length=100,blank=True,null=True)
     delivered = models.DateField(auto_now=True)
-    
+
     class Meta:
         verbose_name_plural = "Deliveries"
 
@@ -42,7 +42,7 @@ class Series(models.Model):
         verbose_name_plural = "Series"
 
     def __str__(self):
-        return '{}: {}'.format(self.filename,self.location.name)
+        return '{}: {}'.format(self.delivery.filename,self.location.name)
 
 class History(models.Model):
     """ A realisation of the time series for a location

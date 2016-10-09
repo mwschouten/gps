@@ -2,6 +2,8 @@
 import pandas as pd
 import re
 from api import models
+from pyproj import Proj, transform
+import os
 
 def get_decimal_degree(s):
     """ Convert ugly string to decimal degree
@@ -17,7 +19,43 @@ def get_decimal_degree(s):
 
 
 
-def import_xlsx(file,name=None,file_stored=None,contributor=None):
+def checkColumns(data):
+    ''' Check height column, and find location
+
+    Now works for Heiligerlee and Barradeel delivery formats 
+    '''
+    err = []
+    cols = data.columns.values
+
+    if 'Hgt_ruw' in cols:
+        col_h = 'Hgt_ruw'
+    else:
+        col_h = None
+
+    # Heiligerlee version
+    if 'Long' in cols and 'Lat' in cols:
+        lon = get_decimal_degree(data.Long[0])
+        lat = get_decimal_degree(data.Lat[0])
+
+    # Barradeel version  
+    elif 'X' in cols and 'Y' in cols:
+        x = data.X[0]
+        y = data.Y[0]
+        if y > 289000 and y < 629000 and x > -7000 and x < 300000:
+            # Guess RD coordinates
+            inProj = Proj(init='epsg:28992')
+            outProj = Proj(init='epsg:4326')
+            lat,lon = transform(inProj,outProj,x,y)
+
+    else:
+        lon,lat = None,None
+
+    return col_h,lon,lat
+
+
+# TODO Make read RD coordinates for BARRADEEL!
+
+def import_xlsx(file_stored,name=None,filename=None,contributor=None):
     """ For now, assume that it is an Antea GPS file with proper columns
     """
     # file = 'data/AGBA4.xlsx'
@@ -25,23 +63,25 @@ def import_xlsx(file,name=None,file_stored=None,contributor=None):
     # contributor=None
     # file_stored=None
 
-    print ('\n\n FILE ',file)
+    print ('\n\n FILE ',filename)
+    print ('\n\n STORED ',file_stored)
     print ('\n\n NAME ',name)
     print ('\n\n')
 
 
-    data = pd.read_excel(file)
+    if filename is None:
+        filename = os.path.split(file_stored)[1]
+
+    data = pd.read_excel(file_stored)
     data = data.set_index('Date_time')
 
-    msg = [('filename',file),('loc_name_provided',name)]
+    msg = [('filename',file_stored),('loc_name_provided',name)]
 
-    if not 'Hgt_ruw' in data.columns.values:
-        msg.append(('ERROR','No Hgt_ruw columns in data'))
-        return msg
-
-
-    lon = get_decimal_degree(data.Long[0])
-    lat = get_decimal_degree(data.Lat[0])
+    col_h,lon,lat = checkColumns(data)
+    if col_h is None:
+        msg.append(('ERROR','No height column recognized'))
+    if lon is None:
+        msg.append(('ERROR','No coordinates recognized'))
 
     locs = models.Location.objects.all()
     # pick right location
@@ -60,9 +100,13 @@ def import_xlsx(file,name=None,file_stored=None,contributor=None):
         msg.append(('new_location',my_location.name))
 
     # this delivery
-    my_delivery,isnew = models.Delivery.objects.get_or_create(filename=file,
+    my_delivery,isnew = models.Delivery.objects.get_or_create(filename=filename,
                                                 filename_stored=file_stored,
-                                                contributor=contributor)
+                                                contributor=contributor,
+                                                )
+
+    my_series = models.Series.objects.create(location=my_location,delivery=my_delivery)
+    
     try:
         my_history = models.History.objects.filter(location=my_location).latest('version')
     except models.History.DoesNotExist:

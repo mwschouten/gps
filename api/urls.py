@@ -17,5 +17,6 @@ from django.conf.urls import url, include
 
 from api import views
 urlpatterns = [
-    url(r'^all/', views.all),
+    url(r'^locations/', views.locations),
+    url(r'^series/', views.timeseries),
 ]

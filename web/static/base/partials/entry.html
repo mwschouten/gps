@@ -1,14 +1,33 @@
 <h1> Hallo </h1>
 
+<!-- <ul>
+    <li ng-repeat="proj in projects">{{proj.name}}
+        <ul>
+            <li ng-repeat="loc in proj.locations">{{loc.name}}</li>
+        </ul>
+    </li>
+</ul> -->
 
-{{fields}}
 
+<div ng-controller="LocationCtrl">
+<p>Current location: {{currentproject.name}}</p>
+<treecontrol class="tree-classic"
+   tree-model="projects"
+   options="treeOptions"
+   on-selection="select(node)"
+   selected-node="currentproject">
+   {{node.name}} 
+   <span ng-show="node.isloaded" 
+         ng-click="remove(node)"
+         class="glyphicon glyphicon-remove"></span>
+</treecontrol>
+</div>
 
 
 <div ng-controller="chartctrl">
 
 
-        <div class="span12">
+<!--         <div class="span12">
             <input ng-model="chartConfig.title.text">
             <button ng-click="addSeries()">Add Series</button>
             <button ng-click="addPoints()">Add Points to Random Series</button>
@@ -16,10 +35,10 @@
             <button ng-click="swapChartType()">Line/Bar</button>
             <button ng-click="toggleLoading()">Loading?</button>
         </div>
+ -->
         <div class="row">
             <highchart id="chart1" config="chartConfig" class="span10"></highchart>
         </div>
 
+<!-- {{chartConfig}} -->
 </div>
-
-<h2> banaan</h2>

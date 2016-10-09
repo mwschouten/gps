@@ -12,8 +12,10 @@ class Command(BaseCommand):
         parser.add_argument('name', nargs='?', default='manual', type=str)
 
     def handle(self, *args, **options):
+
+                print('OPTIONS ',options)
             # try:
-                msg = import_xlsx(file=options['file'][0],name=options['name'])
+                msg = import_xlsx(file_stored=options['file'][0],name=options['name'])
                 self.stdout.write(self.style.SUCCESS('OK, imported {}'.format(options['file'][0])))
 
                 for m in msg:

@@ -1,16 +1,33 @@
 
 app.controller('TestCtrl', function($scope, $http) {
-    init = function(){
-        $scope.name = 'Update Catalogue'
+  init = function() {{}
+  }
 
-        $http.get("api/fields")
+  init()
+});
+
+
+app.controller('LocationCtrl', function($scope, $http, $rootScope) {
+    init = function(){
+        $scope.name = 'Select a GPS station'
+
+        $http.get("api/locations")
             .success(function(data){
-                $scope.fields = data
+                $scope.projects = data['projects']
             })
 
-     
-
+        $scope.treeOptions = {
+          nodeChildren: "locations",
+          dirSelectable: false,
+        }
     }
+
+    $scope.select = function (x) {
+      console.log('Selected ' ,x)
+      $rootScope.$broadcast('toggleStation',x)
+      x.isloaded = !x.isloaded
+    }
+
 
     init()
 });
@@ -18,38 +35,65 @@ app.controller('TestCtrl', function($scope, $http) {
 
 
 
-app.controller('chartctrl', function ($scope) {
+app.controller('chartctrl', function ($scope, $http) {
 
-    $scope.addPoints = function () {
-        var seriesArray = $scope.chartConfig.series
-        var rndIdx = Math.floor(Math.random() * seriesArray.length);
-        seriesArray[rndIdx].data = seriesArray[rndIdx].data.concat([1, 10, 20])
-    };
+    stationids = []
+    do_range = true
 
-    $scope.addSeries = function () {
-        var rnd = []
-        for (var i = 0; i < 10; i++) {
-            rnd.push(Math.floor(Math.random() * 20) + 1)
-        }
-        $scope.chartConfig.series.push({
-            data: rnd
+    convertDate = function(xx){ 
+      return xx.map( 
+        function (a){ 
+          a[0] = Date.parse(a[0])
+          return a
         })
     }
 
-    $scope.removeRandomSeries = function () {
-        var seriesArray = $scope.chartConfig.series
-        var rndIdx = Math.floor(Math.random() * seriesArray.length);
-        seriesArray.splice(rndIdx, 1)
-    }
 
-    $scope.swapChartType = function () {
-        if (this.chartConfig.options.chart.type === 'line') {
-            this.chartConfig.options.chart.type = 'bar'
-        } else {
-            this.chartConfig.options.chart.type = 'line'
-            this.chartConfig.options.chart.zoomType = 'x'
-        }
-    }
+    $scope.$on('toggleStation', function (event, arg) { 
+      var i = stationids.indexOf(arg.id)
+      if (i > -1){
+        console.log('Chart removes ',arg.name)
+        stationids.splice(i,1)
+        $scope.chartConfig.series.splice(i,1)
+      }     
+      else{
+        console.log('Chart loads ',arg.name)
+        loadSeries(arg)
+      }
+    })
+
+
+    loadSeries = function(arg){
+      console.log('Go load data for ',arg.name)
+      $scope.chartConfig.loading = true
+      $http({
+              url:"api/series",
+              method:'GET',
+              params:{'id':arg.id,'ranges':do_range}
+            })
+           .success(function(data){
+
+              $scope.chartConfig.loading = false
+              $scope.chartConfig.series.push(
+                {
+                  data: convertDate(data['data']), name:arg.name
+                }
+              )
+              if (do_range){
+                $scope.chartConfig.series.push(
+                  {
+                    data: convertDate(data['ranges']), name:'Range',
+                    type:'arearange',lineWidth:0,
+                    fillOpacity: 0.3, zIndex:0
+                  }
+                )
+              }
+
+              stationids.push(arg.id)
+              console.log($scope.chartConfig.series)
+           })
+    };
+
 
     $scope.toggleLoading = function () {
         this.chartConfig.loading = !this.chartConfig.loading
@@ -58,28 +102,26 @@ app.controller('chartctrl', function ($scope) {
     $scope.chartConfig = {
         options: {
             chart: {
-                type: 'bar'
-            }
+                type: 'line',
+                zoomType: 'xy'
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Deformation [m]'
+                }
+            },
         },
-        series: [{
-            data: [10, 15, 12, 8, 7]
-        }],
+        series: [],
         title: {
-            text: 'Hello'
+            text: ''
         },
 
         loading: false
     }
-
 });
 
 
-app.controller('DropdownCtrl', function ($scope) {
-  $scope.items = [
-    'The first choice!',
-    'And another choice for you.',
-    'but wait! A third!'
-  ];
 
-
-});
