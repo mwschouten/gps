@@ -66,6 +66,7 @@ def import_xlsx(file_stored,name=None,filename=None,contributor=None):
     print ('\n\n FILE ',filename)
     print ('\n\n STORED ',file_stored)
     print ('\n\n NAME ',name)
+    print ('\n\n DIR NOW ',os.path.abspath('.'))
     print ('\n\n')
 
 
